@@ -1,9 +1,8 @@
 import React from 'react'
 import { Box, Container, createMuiTheme, Paper, ThemeProvider, Typography } from '@material-ui/core';
-import Header from './Header';
-import Contracts from './Contracts';
-import Contract from './Contract';
-import Codes from './Codes';
+import Header from './components/Header';
+import Contract from './components/Contract';
+import Codes from './components/Codes';
 import { Route, RouteComponentProps } from 'react-router';
 
 interface MatchParams {

@@ -5,9 +5,9 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { NavLink, useHistory } from 'react-router-dom'
-import { CodeType } from './api/appAPI'
-import { getCodes, actions } from './redux/appReducer'
-import { StateType } from './redux/store'
+import { CodeType } from '../api/appAPI'
+import { getCodes, actions } from '../redux/appReducer'
+import { StateType } from '../redux/store'
 
 interface IProps {
     codes: Array<CodeType>

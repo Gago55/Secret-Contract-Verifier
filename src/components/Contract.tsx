@@ -3,9 +3,9 @@ import React, { FC, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { compose } from 'redux'
-import { CodeType, ContractType } from './api/appAPI'
-import { actions, getCodeByContractAddress } from './redux/appReducer'
-import { StateType } from './redux/store'
+import { CodeType, ContractType } from '../api/appAPI'
+import { actions, getCodeByContractAddress } from '../redux/appReducer'
+import { StateType } from '../redux/store'
 
 interface IProps {
     address: any
