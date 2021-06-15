@@ -1,6 +1,8 @@
 import React, { FC } from 'react'
-import { AppBar, Box, fade, InputBase, makeStyles, Toolbar, Typography } from '@material-ui/core'
-import SearchIcon from '@material-ui/icons/Search';
+import { AppBar, fade, InputBase, makeStyles, Toolbar, Typography } from '@material-ui/core'
+import SearchIcon from '@material-ui/icons/Search'
+import { useHistory } from 'react-router-dom'
+import { Shift } from './common'
 
 interface IProps {
 
@@ -14,11 +16,10 @@ const useStyles = makeStyles((theme) => ({
         marginRight: theme.spacing(2),
     },
     title: {
-        flexGrow: 1,
         display: 'block',
-        // [theme.breakpoints.up('sm')]: {
-        //     display: 'block',
-        // },
+        '&:hover': {
+            cursor: 'pointer'
+        }
     },
     search: {
         position: 'relative',
@@ -59,17 +60,23 @@ const useStyles = makeStyles((theme) => ({
             // },
         },
     },
-}));
+}))
 
 const Header: FC<IProps> = props => {
-    const classes = useStyles();
+    const classes = useStyles()
+    const history = useHistory()
+
+    const onNameClick = () => {
+        history.push('/')
+    }
 
     return (
         <AppBar position="static">
             <Toolbar>
-                <Typography className={classes.title} variant="h6" noWrap>
+                <Typography className={classes.title} variant="h6" noWrap onClick={onNameClick}>
                     Secret Contracts
                 </Typography>
+                <Shift />
                 <div className={classes.search}>
                     <div className={classes.searchIcon}>
                         <SearchIcon />
