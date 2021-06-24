@@ -17,6 +17,10 @@ export type CodeType = {
     contracts: Array<ContractType>
 }
 
+type VerifyResponseType = {
+    link: string
+}
+
 export const fetchContractByAddress = (address: string) => (
     secretContracts.get<ContractType>(`/contracts/${address}`).then(res => res.data)
 )
@@ -35,4 +39,13 @@ export const fetchCodes = () => (
 
 export const fetchCodeByContractAddress = (address: string) => (
     secretContracts.get<CodeType>(`/codeswithcontracts/contractAddress/${address}`).then(res => res.data)
+)
+
+export const verifyAttempt = (codeId: number, zipData: FormData) => (
+    secretContracts.post<VerifyResponseType>(`/codes/verify/${codeId}`, zipData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+            // 'Content-Type': 'application/json'
+        }
+    }).then(res => res.data)
 )

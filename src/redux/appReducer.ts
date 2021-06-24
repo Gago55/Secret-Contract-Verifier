@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import { CodeType, fetchCodeByContractAddress, fetchCodes } from './../api/appAPI';
+import { CodeType, fetchCodeByContractAddress, fetchCodes, verifyAttempt } from './../api/appAPI';
 import { InferActionsType, StateType } from './store';
 
 const initState = {
@@ -76,6 +76,14 @@ export const getCodeByContractAddress = (address: string): ThunkType => async (d
         } catch (error) {
 
         }
+    }
+}
+
+export const verify = (codeId: number, zipData: FormData): ThunkType => async (dispatch: DispatchType) => {
+    try {
+        await verifyAttempt(codeId, zipData)
+    } catch (error) {
+
     }
 }
 

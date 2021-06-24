@@ -104,7 +104,7 @@ const Row: FC<IRowProps> = ({ row, contracts, setActualCodeById }) => {
                 </TableCell>
             </TableRow>
             <TableRow>
-                <TableCell id="gag" style={{ paddingLeft: 100, paddingRight: 100, paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                <TableCell style={{ paddingLeft: 100, paddingRight: 100, paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box margin={1}>
                             <Typography variant="h6" gutterBottom component="div">
