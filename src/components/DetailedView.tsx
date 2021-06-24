@@ -4,18 +4,22 @@ import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { compose } from 'redux'
 import { CodeType, ContractType } from '../api/appAPI'
-import { actions, getCodeByContractAddress, verify } from '../redux/appReducer'
+import { actions, getCodeByContractAddress, verify, VerifyResponseType } from '../redux/appReducer'
 import { StateType } from '../redux/store'
 import Code from './Code'
 import Contract from './Contract'
 import Source from './Source'
 
 interface IProps {
-    address: any
+    address: string | undefined
     actualCode?: CodeType
+    verifyResponse: VerifyResponseType
+    verifyResponseError: string
 
     getCodeByContractAddress(address: string): void
     verify(codeId: number, zipData: FormData): void
+    setVerifyResponse(status: number, id: string, onProgressId: string): void
+    setVerifyResponseError(msg: string): void
 }
 
 const DetailedView: FC<IProps> = props => {
@@ -45,7 +49,16 @@ const DetailedView: FC<IProps> = props => {
             <Contract contract={contract} />
             <Code code={props.actualCode} />
         </Box>
-        <Source isVerified={props.actualCode.isVerified} codeId={props.actualCode.id} address={contract.address} verify={props.verify} />
+        <Source
+            isVerified={props.actualCode.isVerified}
+            codeId={props.actualCode.id}
+            address={contract.address}
+            verify={props.verify}
+            verifyResponse={props.verifyResponse}
+            setVerifyResponse={props.setVerifyResponse}
+            verifyResponseError={props.verifyResponseError}
+            setVerifyResponseError={props.setVerifyResponseError}
+        />
     </Box>
     )
 
@@ -53,9 +66,14 @@ const DetailedView: FC<IProps> = props => {
 }
 
 const mapStateToProps = (state: StateType) => ({
-    actualCode: state.appReducer.actualCode
+    actualCode: state.appReducer.actualCode,
+    verifyResponse: state.appReducer.verifyResponse,
+    verifyResponseError: state.appReducer.verifyResponseError
 })
 
-export default compose(
-    connect(mapStateToProps, { getCodeByContractAddress, verify })
-)(DetailedView)
+export default connect(mapStateToProps, {
+    getCodeByContractAddress,
+    verify,
+    setVerifyResponse: actions.setVerifyResponse,
+    setVerifyResponseError: actions.setVerifyResponseError
+})(DetailedView)

@@ -1,24 +1,44 @@
-import { Box, makeStyles, Paper, Typography, CircularProgress, Dialog, DialogTitle, Slide, DialogActions, DialogContentText, DialogContent, MenuItem, Button, FormControl, InputLabel, Select } from '@material-ui/core'
+import { Box, makeStyles, Paper, Typography, IconButton, CircularProgress, Dialog, DialogTitle, Slide, DialogActions, DialogContentText, DialogContent, MenuItem, Button, FormControl, InputLabel, Select } from '@material-ui/core'
 import JSZip from 'jszip'
 import React, { ChangeEvent, FC, useState } from 'react'
 import { useSnackbar, VariantType } from 'notistack'
 import { TransitionProps } from '@material-ui/core/transitions/transition'
+import { VerifyResponseType } from '../redux/appReducer'
+import CloseIcon from '@material-ui/icons/Close'
+import { Shift } from './common'
+import { useHistory } from 'react-router-dom'
+import { useEffect } from 'react'
 
 interface IProps {
     isVerified: boolean
     codeId: number
     address: string
+    verifyResponse: VerifyResponseType
+    verifyResponseError: string
 
     verify(codeId: number, zipData: FormData): void
+    setVerifyResponse(status: number, id: string, onProgressId: string): void
+    setVerifyResponseError(msg: string): void
 }
 
 const useStyles = makeStyles({
-    verify: {
+    link: {
         fontWeight: 'bolder',
         color: '#3498db',
         '&:hover': {
             cursor: 'pointer'
         }
+    },
+    verifyResponseTitle: {
+        // display: ''
+        // margin: 0,
+        // padding: theme.spacing(2),
+    },
+    closeButton: {
+        position: 'absolute',
+        right: 5,
+        top: 5,
+        // color: theme.palette.grey[500],
     }
 })
 
@@ -26,20 +46,22 @@ const TransitionUp = (props: TransitionProps) => {
     return <Slide {...props} direction="up" />
 }
 
-const Source: FC<IProps> = ({ isVerified, codeId, address, verify }) => {
+const Source: FC<IProps> = ({ isVerified, codeId, address, verifyResponse, verifyResponseError, verify, setVerifyResponse, setVerifyResponseError }) => {
     const classes = useStyles()
 
     type BuilderVersionType = '1.0.0' | '1.0.1' | '1.0.2' | '1.0.3' | '1.0.4'
 
-    const [verifyDialogOpen, setVerifyDialogOpen] = useState(true)
+    const [verifyDialogOpen, setVerifyDialogOpen] = useState(false)
+    // const [verifyResponseDialogOpen, setVerifyResponseDialogOpen] = useState(false)
     const [fileName, setFileName] = useState('')
     const [builderVersion, setBuilderVersion] = useState<BuilderVersionType | ''>('')
     const [zipData, setZipData] = useState<FormData | null>(null)
     const [loading, setLoading] = useState(false)
 
     const { enqueueSnackbar, closeSnackbar } = useSnackbar()
+    const history = useHistory()
 
-    const showMessage = (message: string, variant: VariantType = 'error', duartion: number = 7000) => {
+    const showMessage = (message: string, variant: VariantType = 'error', duartion: number = 7000, onClose: () => void = () => { }) => {
         enqueueSnackbar(message, {
             variant,
             TransitionComponent: TransitionUp,
@@ -47,7 +69,8 @@ const Source: FC<IProps> = ({ isVerified, codeId, address, verify }) => {
                 horizontal: 'center',
                 vertical: 'bottom'
             },
-            autoHideDuration: duartion
+            autoHideDuration: duartion,
+            onClose
         })
     }
 
@@ -101,6 +124,10 @@ const Source: FC<IProps> = ({ isVerified, codeId, address, verify }) => {
                     zip.remove('.git')
                 }
 
+                if (zip.files['.github/']) {
+                    zip.remove('.github')
+                }
+
                 zipToFormData(zip)
             }
             else {
@@ -126,6 +153,10 @@ const Source: FC<IProps> = ({ isVerified, codeId, address, verify }) => {
 
                         if (zip.files[folderName + '/.git/']) {
                             zip.remove(folderName + '/.git')
+                        }
+
+                        if (zip.files[folderName + '/.github/']) {
+                            zip.remove(folderName + '/.github')
                         }
 
                         zipToFormData(zip)
@@ -158,7 +189,25 @@ const Source: FC<IProps> = ({ isVerified, codeId, address, verify }) => {
         }
 
         verify(codeId, zipData)
+
+        setFileName('')
+        setZipData(null)
+        setBuilderVersion('')
+        setVerifyDialogOpen(false)
     }
+
+    const onVerifyResponseClose = () => {
+        setVerifyResponse(0, '', '')
+    }
+
+    const al = 'center'
+
+    useEffect(() => {
+        if (verifyResponseError)
+            showMessage(verifyResponseError, 'error', 7000, () => {
+                setVerifyResponseError('')
+            })
+    }, [verifyResponseError])
 
     return (<>
         <Paper style={{ width: '100%', padding: 15 }}>
@@ -172,7 +221,7 @@ const Source: FC<IProps> = ({ isVerified, codeId, address, verify }) => {
                 <Typography variant="body2">
                     Are you the contract creator?
                     <span
-                        className={classes.verify}
+                        className={classes.link}
                         onClick={onVerifyAndPublishClick}
                     > Verify and Publish</span> your contract source code now!
                 </Typography>
@@ -223,6 +272,105 @@ const Source: FC<IProps> = ({ isVerified, codeId, address, verify }) => {
             </DialogContent>
             <DialogActions>
                 <Button color="primary" variant='contained' onClick={onVerifyClick}>Verify</Button>
+            </DialogActions>
+        </Dialog>
+        <Dialog
+            open={verifyResponse.status !== 0}
+            // open={verifyResponseDialogOpen}
+            onClose={onVerifyResponseClose}
+        >
+            <DialogTitle className={classes.verifyResponseTitle}>
+                Verify Attempt Information
+                <IconButton aria-label="close"
+                    className={classes.closeButton}
+                    onClick={onVerifyResponseClose}>
+                    <CloseIcon />
+                </IconButton>
+            </DialogTitle>
+            <DialogContent dividers>
+                {verifyResponse.status == 200 && <>
+                    <DialogContentText align={al}>
+                        The verification process has been started. It takes 5-10 minutes․
+                    </DialogContentText>
+                    <DialogContentText align={al}>
+                        You can take a look at the verification process by following the link below
+                    </DialogContentText>
+                    <DialogContentText align={al}>
+                        <span
+                            className={classes.link}
+                            onClick={() => {
+                                setVerifyResponse(0, '', '')
+                                history.push(
+                                    `/verifyattempts/${verifyResponse.verifyAttemptId}`
+                                )
+                            }}
+                        >
+                            http://localhost:3000/verifyattempts/{verifyResponse.verifyAttemptId}
+                        </span>
+                    </DialogContentText>
+                </>}
+                {verifyResponse.status == 201 && <>
+                    <DialogContentText align={al}>
+                        At this moment, another verification is in process. It can take maximum 10 minutes․ Your verification attempt has been added to the queue.
+                    </DialogContentText>
+                    <DialogContentText align={al}>
+                        You can take a look at your verification process by following the link below
+                    </DialogContentText>
+                    <DialogContentText align={al}>
+                        <span
+                            className={classes.link}
+                            onClick={() => {
+                                setVerifyResponse(0, '', '')
+                                history.push(
+                                    `/verifyattempts/${verifyResponse.verifyAttemptId}`
+                                )
+                            }}
+                        >
+                            http://localhost:3000/verifyattempts/{verifyResponse.verifyAttemptId}
+                        </span>
+                    </DialogContentText>
+                    <DialogContentText align={al}>
+                        You can take a look at ongoing verification process with the following link
+                    </DialogContentText>
+                    <DialogContentText align={al}>
+                        <span
+                            className={classes.link}
+                            onClick={() => {
+                                setVerifyResponse(0, '', '')
+                                history.push(
+                                    `/verifyattempts/${verifyResponse.onProgressAttemptId}`
+                                )
+                            }}
+                        >
+                            http://localhost:3000/verifyattempts/{verifyResponse.onProgressAttemptId}
+                        </span>
+                    </DialogContentText>
+
+                </>}
+                {verifyResponse.status == 202 && <>
+                    <DialogContentText align={al}>
+                        At this moment for Code ID {codeId}, another verification is in process.
+                    </DialogContentText>
+                    <DialogContentText align={al}>
+                        You can take a look at the verification process by following the link below
+                    </DialogContentText>
+                    <DialogContentText align={al}>
+                        <span
+                            className={classes.link}
+                            onClick={() => {
+                                setVerifyResponse(0, '', '')
+                                history.push(
+                                    `/verifyattempts/${verifyResponse.onProgressAttemptId}`
+                                )
+                            }}
+                        >
+                            http://localhost:3000/verifyattempts/{verifyResponse.onProgressAttemptId}
+                        </span>
+                    </DialogContentText>
+                </>}
+            </DialogContent>
+            <DialogActions>
+                <Button color="primary" variant='contained' onClick={onVerifyResponseClose}>OK</Button>
             </DialogActions>
         </Dialog>
     </>

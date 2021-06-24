@@ -5,13 +5,13 @@ import DetailedView from './components/DetailedView';
 import Codes from './components/Codes';
 import { Route, RouteComponentProps } from 'react-router';
 import { SnackbarProvider } from 'notistack'
+import VerifyAttempt from './components/VerifyAttempt';
 
-interface MatchParams {
-  address?: string;
-}
+interface MatchParamsDetailedView { address?: string; }
+interface MatchPropsDetailedView extends RouteComponentProps<MatchParamsDetailedView> { }
 
-interface MatchProps extends RouteComponentProps<MatchParams> {
-}
+interface MatchParamsVerifyAttempt { id?: string; }
+interface MatchPropsVerifyAttempt extends RouteComponentProps<MatchParamsVerifyAttempt> { }
 
 const App = () => {
 
@@ -22,7 +22,8 @@ const App = () => {
         <Container>
           <Box m={3} style={{}}>
             <Route exact path="/" render={() => <Codes />} />
-            <Route path="/:address?" render={({ match }: MatchProps) => <DetailedView address={match.params.address} />} />
+            <Route path="/contracts/:address?" render={({ match }: MatchPropsDetailedView) => <DetailedView address={match.params.address} />} />
+            <Route path="/verifyattempts/:id?" render={({ match }: MatchPropsVerifyAttempt) => <VerifyAttempt attemptId={match.params.id} />} />
           </Box>
         </Container>
       </div>

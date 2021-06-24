@@ -83,7 +83,7 @@ const Row: FC<IRowProps> = ({ row, contracts, setActualCodeById }) => {
     const [open, setOpen] = useState(false)
 
     const history = useHistory()
-    const handleOnClick = (address: string) => history.push('/' + address)
+    const handleOnClick = (address: string) => history.push('/contracts/' + address)
 
     return (
         <>

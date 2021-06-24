@@ -18,7 +18,8 @@ export type CodeType = {
 }
 
 type VerifyResponseType = {
-    link: string
+    verifyAttemptId?: string
+    onProgressAttemptId?: string
 }
 
 export const fetchContractByAddress = (address: string) => (
@@ -47,5 +48,5 @@ export const verifyAttempt = (codeId: number, zipData: FormData) => (
             'Content-Type': 'multipart/form-data'
             // 'Content-Type': 'application/json'
         }
-    }).then(res => res.data)
+    })
 )

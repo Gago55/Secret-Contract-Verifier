@@ -3,9 +3,21 @@ import { ThunkAction } from 'redux-thunk';
 import { CodeType, fetchCodeByContractAddress, fetchCodes, verifyAttempt } from './../api/appAPI';
 import { InferActionsType, StateType } from './store';
 
+export type VerifyResponseType = {
+    status: number
+    verifyAttemptId: string
+    onProgressAttemptId: string
+}
+
 const initState = {
     codes: [] as Array<CodeType>,
-    actualCode: undefined as undefined | CodeType
+    actualCode: undefined as undefined | CodeType,
+    verifyResponse: {
+        status: 0,
+        verifyAttemptId: '',
+        onProgressAttemptId: ''
+    } as VerifyResponseType,
+    verifyResponseError: ''
 }
 
 type InitStateType = typeof initState
@@ -27,6 +39,20 @@ const appReducer = (state = initState, action: ActionsType): InitStateType => {
                 ...state,
                 actualCode: state.codes.find(code => code.id == action.codeId)
             }
+        case 'sc/app/SET_VERIFY_RESPONSE':
+            return {
+                ...state,
+                verifyResponse: {
+                    status: action.status,
+                    verifyAttemptId: action.id,
+                    onProgressAttemptId: action.onProgressId
+                }
+            }
+        case 'sc/app/SET_VERIFY_RESPONSE_ERROR':
+            return {
+                ...state,
+                verifyResponseError: action.msg
+            }
         default:
             return state
     }
@@ -35,7 +61,9 @@ const appReducer = (state = initState, action: ActionsType): InitStateType => {
 export const actions = {
     setCodes: (arr: Array<CodeType>) => ({ type: 'sc/app/SET_CODES', arr } as const),
     setActualCode: (code: CodeType) => ({ type: 'sc/app/SET_ACTUAL_CODE', code } as const),
-    setActualCodeById: (codeId: number) => ({ type: 'sc/app/SET_ACTUAL_CODE_BY_ID', codeId } as const)
+    setActualCodeById: (codeId: number) => ({ type: 'sc/app/SET_ACTUAL_CODE_BY_ID', codeId } as const),
+    setVerifyResponse: (status: number, id: string, onProgressId: string) => ({ type: 'sc/app/SET_VERIFY_RESPONSE', status, id, onProgressId } as const),
+    setVerifyResponseError: (msg: string) => ({ type: 'sc/app/SET_VERIFY_RESPONSE_ERROR', msg } as const)
 }
 
 export type ActionsType = InferActionsType<typeof actions>
@@ -81,9 +109,19 @@ export const getCodeByContractAddress = (address: string): ThunkType => async (d
 
 export const verify = (codeId: number, zipData: FormData): ThunkType => async (dispatch: DispatchType) => {
     try {
-        await verifyAttempt(codeId, zipData)
-    } catch (error) {
+        const verifyResponse = await verifyAttempt(codeId, zipData)
+        console.log(verifyResponse)
 
+        dispatch(actions.setVerifyResponse(
+            verifyResponse.status,
+            verifyResponse.data.verifyAttemptId ? verifyResponse.data.verifyAttemptId : '',
+            verifyResponse.data.onProgressAttemptId ? verifyResponse.data.onProgressAttemptId : ''
+        ))
+    } catch (error) {
+        if (error.response)
+            dispatch(actions.setVerifyResponseError(error.response.data.message))
+        else
+            dispatch(actions.setVerifyResponseError(error.message))
     }
 }
 
