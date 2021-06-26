@@ -3,8 +3,8 @@ import React, { FC, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { compose } from 'redux'
-import { CodeType, ContractType } from '../api/appAPI'
-import { actions, getCodeByContractAddress, verify, VerifyResponseType } from '../redux/appReducer'
+import { CodeType, ContractType, SourceDataType } from '../api/appAPI'
+import { actions, getCodeByContractAddress, getSourceData, verify, VerifyResponseType } from '../redux/appReducer'
 import { StateType } from '../redux/store'
 import Code from './Code'
 import Contract from './Contract'
@@ -13,6 +13,7 @@ import Source from './Source'
 interface IProps {
     address: string | undefined
     actualCode?: CodeType
+    actualSourceData?: SourceDataType
     verifyResponse: VerifyResponseType
     verifyResponseError: string
 
@@ -20,6 +21,7 @@ interface IProps {
     verify(codeId: number, zipData: FormData): void
     setVerifyResponse(status: number, id: string, onProgressId: string): void
     setVerifyResponseError(msg: string): void
+    getSourceData(codeId: number | string): void
 }
 
 const DetailedView: FC<IProps> = props => {
@@ -58,22 +60,24 @@ const DetailedView: FC<IProps> = props => {
             setVerifyResponse={props.setVerifyResponse}
             verifyResponseError={props.verifyResponseError}
             setVerifyResponseError={props.setVerifyResponseError}
+            actualSourceData={props.actualSourceData}
+            getSourceData={props.getSourceData}
         />
     </Box>
     )
-
-
 }
 
 const mapStateToProps = (state: StateType) => ({
     actualCode: state.appReducer.actualCode,
+    actualSourceData: state.appReducer.actualSourceData,
     verifyResponse: state.appReducer.verifyResponse,
-    verifyResponseError: state.appReducer.verifyResponseError
+    verifyResponseError: state.appReducer.verifyResponseError,
 })
 
 export default connect(mapStateToProps, {
     getCodeByContractAddress,
     verify,
     setVerifyResponse: actions.setVerifyResponse,
-    setVerifyResponseError: actions.setVerifyResponseError
+    setVerifyResponseError: actions.setVerifyResponseError,
+    getSourceData
 })(DetailedView)

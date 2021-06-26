@@ -8,6 +8,8 @@ import CloseIcon from '@material-ui/icons/Close'
 import { Shift } from './common'
 import { useHistory } from 'react-router-dom'
 import { useEffect } from 'react'
+import { SourceDataType } from '../api/appAPI'
+import SourceTreeView from './SourceTreeView'
 
 interface IProps {
     isVerified: boolean
@@ -15,10 +17,12 @@ interface IProps {
     address: string
     verifyResponse: VerifyResponseType
     verifyResponseError: string
+    actualSourceData?: SourceDataType
 
     verify(codeId: number, zipData: FormData): void
     setVerifyResponse(status: number, id: string, onProgressId: string): void
     setVerifyResponseError(msg: string): void
+    getSourceData(codeId: number | string): void
 }
 
 const useStyles = makeStyles({
@@ -46,7 +50,11 @@ const TransitionUp = (props: TransitionProps) => {
     return <Slide {...props} direction="up" />
 }
 
-const Source: FC<IProps> = ({ isVerified, codeId, address, verifyResponse, verifyResponseError, verify, setVerifyResponse, setVerifyResponseError }) => {
+const Source: FC<IProps> = ({
+    isVerified, codeId, address, verifyResponse, verifyResponseError, actualSourceData,
+    verify, setVerifyResponse, setVerifyResponseError, getSourceData
+}) => {
+
     const classes = useStyles()
 
     type BuilderVersionType = '1.0.0' | '1.0.1' | '1.0.2' | '1.0.3' | '1.0.4'
@@ -200,7 +208,15 @@ const Source: FC<IProps> = ({ isVerified, codeId, address, verifyResponse, verif
         setVerifyResponse(0, '', '')
     }
 
-    const al = 'center'
+    const textAlignOfDialog = 'center'
+
+    useEffect(() => {
+
+        if (isVerified) {
+            getSourceData(codeId)
+        }
+
+    }, [])
 
     useEffect(() => {
         if (verifyResponseError)
@@ -226,6 +242,9 @@ const Source: FC<IProps> = ({ isVerified, codeId, address, verifyResponse, verif
                     > Verify and Publish</span> your contract source code now!
                 </Typography>
             </>}
+            {
+                isVerified && <SourceTreeView sourceData={actualSourceData} />
+            }
         </Paper>
         <Dialog
             open={verifyDialogOpen}
@@ -289,13 +308,13 @@ const Source: FC<IProps> = ({ isVerified, codeId, address, verifyResponse, verif
             </DialogTitle>
             <DialogContent dividers>
                 {verifyResponse.status == 200 && <>
-                    <DialogContentText align={al}>
+                    <DialogContentText align={textAlignOfDialog}>
                         The verification process has been started. It takes 5-10 minutes․
                     </DialogContentText>
-                    <DialogContentText align={al}>
+                    <DialogContentText align={textAlignOfDialog}>
                         You can take a look at the verification process by following the link below
                     </DialogContentText>
-                    <DialogContentText align={al}>
+                    <DialogContentText align={textAlignOfDialog}>
                         <span
                             className={classes.link}
                             onClick={() => {
@@ -310,13 +329,13 @@ const Source: FC<IProps> = ({ isVerified, codeId, address, verifyResponse, verif
                     </DialogContentText>
                 </>}
                 {verifyResponse.status == 201 && <>
-                    <DialogContentText align={al}>
+                    <DialogContentText align={textAlignOfDialog}>
                         At this moment, another verification is in process. It can take maximum 10 minutes․ Your verification attempt has been added to the queue.
                     </DialogContentText>
-                    <DialogContentText align={al}>
+                    <DialogContentText align={textAlignOfDialog}>
                         You can take a look at your verification process by following the link below
                     </DialogContentText>
-                    <DialogContentText align={al}>
+                    <DialogContentText align={textAlignOfDialog}>
                         <span
                             className={classes.link}
                             onClick={() => {
@@ -329,10 +348,10 @@ const Source: FC<IProps> = ({ isVerified, codeId, address, verifyResponse, verif
                             http://localhost:3000/verifyattempts/{verifyResponse.verifyAttemptId}
                         </span>
                     </DialogContentText>
-                    <DialogContentText align={al}>
+                    <DialogContentText align={textAlignOfDialog}>
                         You can take a look at ongoing verification process with the following link
                     </DialogContentText>
-                    <DialogContentText align={al}>
+                    <DialogContentText align={textAlignOfDialog}>
                         <span
                             className={classes.link}
                             onClick={() => {
@@ -348,13 +367,13 @@ const Source: FC<IProps> = ({ isVerified, codeId, address, verifyResponse, verif
 
                 </>}
                 {verifyResponse.status == 202 && <>
-                    <DialogContentText align={al}>
+                    <DialogContentText align={textAlignOfDialog}>
                         At this moment for Code ID {codeId}, another verification is in process.
                     </DialogContentText>
-                    <DialogContentText align={al}>
+                    <DialogContentText align={textAlignOfDialog}>
                         You can take a look at the verification process by following the link below
                     </DialogContentText>
-                    <DialogContentText align={al}>
+                    <DialogContentText align={textAlignOfDialog}>
                         <span
                             className={classes.link}
                             onClick={() => {

@@ -30,6 +30,13 @@ export type VerifyAttemptType = {
     date: Date
 }
 
+export type SourceDataType = {
+    codeId: number
+    zipData: string
+    date: Date
+    githubLink?: string
+}
+
 export const fetchContractByAddress = (address: string) => (
     secretContracts.get<ContractType>(`/contracts/${address}`).then(res => res.data)
 )
@@ -61,4 +68,8 @@ export const verifyAttempt = (codeId: number, zipData: FormData) => (
 
 export const fetchVerifyAttempt = (id: string) => (
     secretContracts.get<VerifyAttemptType>(`/verifyattempts/${id}`).then(res => res.data)
+)
+
+export const fetchSourceData = (codeId: number | string) => (
+    secretContracts.get<SourceDataType>(`/verifiedsource/${codeId}`).then(res => res.data)
 )

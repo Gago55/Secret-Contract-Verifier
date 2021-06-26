@@ -1,7 +1,6 @@
 import React, { FC } from 'react'
 import { AppBar, fade, InputBase, makeStyles, Toolbar, Typography } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
-import { useHistory } from 'react-router-dom'
 import { Shift } from './common'
 
 interface IProps {
@@ -64,10 +63,9 @@ const useStyles = makeStyles((theme) => ({
 
 const Header: FC<IProps> = props => {
     const classes = useStyles()
-    const history = useHistory()
 
     const onNameClick = () => {
-        history.push('/')
+        window.location.href = '/'
     }
 
     return (
