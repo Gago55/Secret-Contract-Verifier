@@ -22,6 +22,14 @@ type VerifyResponseType = {
     onProgressAttemptId?: string
 }
 
+export type VerifyAttemptType = {
+    _id: string
+    codeId: number
+    status: 'success' | 'failed' | 'onProgress' | 'inOrder'
+    logs: Array<string>
+    date: Date
+}
+
 export const fetchContractByAddress = (address: string) => (
     secretContracts.get<ContractType>(`/contracts/${address}`).then(res => res.data)
 )
@@ -49,4 +57,8 @@ export const verifyAttempt = (codeId: number, zipData: FormData) => (
             // 'Content-Type': 'application/json'
         }
     })
+)
+
+export const fetchVerifyAttempt = (id: string) => (
+    secretContracts.get<VerifyAttemptType>(`/verifyattempts/${id}`).then(res => res.data)
 )

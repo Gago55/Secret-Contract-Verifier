@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import { CodeType, fetchCodeByContractAddress, fetchCodes, verifyAttempt } from './../api/appAPI';
+import { CodeType, fetchCodeByContractAddress, fetchCodes, verifyAttempt, VerifyAttemptType, fetchVerifyAttempt } from './../api/appAPI';
 import { InferActionsType, StateType } from './store';
 
 export type VerifyResponseType = {
@@ -17,7 +17,8 @@ const initState = {
         verifyAttemptId: '',
         onProgressAttemptId: ''
     } as VerifyResponseType,
-    verifyResponseError: ''
+    verifyResponseError: '',
+    actualVerifyAttempt: undefined as undefined | VerifyAttemptType
 }
 
 type InitStateType = typeof initState
@@ -53,6 +54,11 @@ const appReducer = (state = initState, action: ActionsType): InitStateType => {
                 ...state,
                 verifyResponseError: action.msg
             }
+        case 'sc/app/SET_ACTUAL_VERIFY_ATTEMPT':
+            return {
+                ...state,
+                actualVerifyAttempt: action.attempt
+            }
         default:
             return state
     }
@@ -63,7 +69,8 @@ export const actions = {
     setActualCode: (code: CodeType) => ({ type: 'sc/app/SET_ACTUAL_CODE', code } as const),
     setActualCodeById: (codeId: number) => ({ type: 'sc/app/SET_ACTUAL_CODE_BY_ID', codeId } as const),
     setVerifyResponse: (status: number, id: string, onProgressId: string) => ({ type: 'sc/app/SET_VERIFY_RESPONSE', status, id, onProgressId } as const),
-    setVerifyResponseError: (msg: string) => ({ type: 'sc/app/SET_VERIFY_RESPONSE_ERROR', msg } as const)
+    setVerifyResponseError: (msg: string) => ({ type: 'sc/app/SET_VERIFY_RESPONSE_ERROR', msg } as const),
+    setActualVerifyAttempt: (attempt: VerifyAttemptType) => ({ type: 'sc/app/SET_ACTUAL_VERIFY_ATTEMPT', attempt } as const),
 }
 
 export type ActionsType = InferActionsType<typeof actions>
@@ -122,6 +129,15 @@ export const verify = (codeId: number, zipData: FormData): ThunkType => async (d
             dispatch(actions.setVerifyResponseError(error.response.data.message))
         else
             dispatch(actions.setVerifyResponseError(error.message))
+    }
+}
+
+export const getVerifyAttempt = (id: string): ThunkType => async (dispatch: DispatchType) => {
+    try {
+        const attempt = await fetchVerifyAttempt(id)
+
+        dispatch(actions.setActualVerifyAttempt(attempt))
+    } catch (error) {
     }
 }
 
