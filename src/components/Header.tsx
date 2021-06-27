@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
 import { AppBar, fade, InputBase, makeStyles, Toolbar, Typography } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
 import { Shift } from './common'
@@ -64,6 +64,8 @@ const useStyles = makeStyles((theme) => ({
 const Header: FC<IProps> = props => {
     const classes = useStyles()
 
+    const [searchValue, setSearchValue] = useState('')
+
     const onNameClick = () => {
         window.location.href = '/'
     }
@@ -80,10 +82,18 @@ const Header: FC<IProps> = props => {
                         <SearchIcon />
                     </div>
                     <InputBase
-                        placeholder="Search…"
+                        placeholder="Enter contract address..."
                         classes={{
                             root: classes.inputRoot,
                             input: classes.inputInput,
+                        }}
+                        value={searchValue}
+                        onChange={(e) => { setSearchValue(e.currentTarget.value) }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                if (searchValue.length === 45 && searchValue.slice(0, 6) === 'secret')
+                                    window.location.href = '/contracts/' + searchValue
+                            }
                         }}
                         inputProps={{ 'aria-label': 'search' }}
                     />
