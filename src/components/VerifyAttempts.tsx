@@ -65,8 +65,8 @@ const Row: FC<IRowProps> = ({ verifyAttempt }) => {
             <TableRow className={classes.root} hover onClick={() => { handleRowClick(verifyAttempt.id) }}>
                 <TableCell align='center'> {verifyAttempt.id} </TableCell>
                 <TableCell align='center'>{verifyAttempt.codeId}</TableCell>
-                <TableCell align='center'>{verifyAttempt.status}</TableCell>
-                <TableCell align='center'>{new Date(verifyAttempt.date).toLocaleDateString()}</TableCell>
+                <TableCell align='center'>{verifyAttempt.status === 'inOrder' ? 'inQueue' : verifyAttempt.status}</TableCell>
+                <TableCell align='center'>{new Date(verifyAttempt.date).toLocaleString(undefined, { hour12: false })}</TableCell>
             </TableRow>
         </>
     )
@@ -89,7 +89,6 @@ const useStyles = makeStyles({
 interface ISortedTableHeadProps {
     classes: ReturnType<typeof useStyles>
     onRequestSort: (
-        event: React.MouseEvent<unknown>,
         property: OrderByType
     ) => void
     order: Order
@@ -128,7 +127,7 @@ const headCells = [
 
 const SortedTableHead: FC<ISortedTableHeadProps> = ({ classes, order, orderBy, onRequestSort }) => {
 
-    const createSortHandler = (property: OrderByType) => (event: React.MouseEvent<unknown>) => { onRequestSort(event, property) }
+    const createSortHandler = (property: OrderByType) => (event: React.MouseEvent<unknown>) => { onRequestSort(property) }
 
     return (
         <TableHead>
@@ -175,11 +174,11 @@ interface IProps {
 const VerifyAttempts: FC<IProps> = props => {
     const classes = useStyles()
 
-    const [order, setOrder] = useState<Order>("asc")
-    const [orderBy, setOrderBy] = useState<OrderByType>("id")
+    const [order, setOrder] = useState<Order>("desc")
+    const [orderBy, setOrderBy] = useState<OrderByType>("date")
     const [rows, setRows] = useState<Array<RowDataType>>([])
 
-    const handleRequestSort = (event: React.MouseEvent<unknown>, property: OrderByType) => {
+    const handleRequestSort = (property: OrderByType) => {
         const isAsc = orderBy === property && order === "asc"
         setOrder(isAsc ? "desc" : "asc")
         setOrderBy(property)
@@ -200,7 +199,7 @@ const VerifyAttempts: FC<IProps> = props => {
                 date: new Date(attempt.date).getTime()
             }))
 
-            setRows(newRows)
+            setRows(stableSort(newRows, getComparator(order, orderBy)))
         }
     }, [props.verifyAttempts])
 
@@ -210,7 +209,9 @@ const VerifyAttempts: FC<IProps> = props => {
                 Verify Attempts
             </Typography>
             <TableContainer component={Paper}>
-                <Table>
+                <Table
+                // size="small"
+                >
                     <SortedTableHead
                         classes={classes}
                         order={order}
