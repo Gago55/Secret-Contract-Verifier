@@ -165,13 +165,12 @@ interface RowDataType {
     date: number
 }
 
-interface IProps {
+interface IVerifyAttemptsTableProps {
     verifyAttempts: Array<VerifyAttemptType>
-
-    getVerifyAttempts(): void
+    isSmall?: boolean
 }
 
-const VerifyAttempts: FC<IProps> = props => {
+export const VerifyAttemptsTable: FC<IVerifyAttemptsTableProps> = ({ verifyAttempts, isSmall }) => {
     const classes = useStyles()
 
     const [order, setOrder] = useState<Order>("desc")
@@ -187,20 +186,55 @@ const VerifyAttempts: FC<IProps> = props => {
     }
 
     useEffect(() => {
+
+        const newRows = [] as Array<RowDataType>
+
+        verifyAttempts.forEach(attempt => newRows.push({
+            id: attempt._id,
+            codeId: attempt.codeId,
+            status: attempt.status,
+            date: new Date(attempt.date).getTime()
+        }))
+
+        setRows(stableSort(newRows, getComparator(order, orderBy)))
+
+    }, [verifyAttempts])
+
+    return (
+        <TableContainer component={Paper}>
+            <Table
+                size={isSmall ? "small" : 'medium'}
+            >
+                <SortedTableHead
+                    classes={classes}
+                    order={order}
+                    orderBy={orderBy}
+                    onRequestSort={handleRequestSort}
+                />
+                <TableBody>
+                    {rows.map((row) => (
+                        <Row
+                            key={row.id}
+                            verifyAttempt={row}
+                        />
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    )
+}
+
+interface IProps {
+    verifyAttempts: Array<VerifyAttemptType>
+
+    getVerifyAttempts(): void
+}
+
+const VerifyAttempts: FC<IProps> = props => {
+
+    useEffect(() => {
         if (!props.verifyAttempts.length)
             props.getVerifyAttempts()
-        else {
-            const newRows = [] as Array<RowDataType>
-
-            props.verifyAttempts.forEach(attempt => newRows.push({
-                id: attempt._id,
-                codeId: attempt.codeId,
-                status: attempt.status,
-                date: new Date(attempt.date).getTime()
-            }))
-
-            setRows(stableSort(newRows, getComparator(order, orderBy)))
-        }
     }, [props.verifyAttempts])
 
     return (
@@ -208,26 +242,7 @@ const VerifyAttempts: FC<IProps> = props => {
             <Typography variant="h6" noWrap style={{ marginBottom: 5 }}>
                 Verify Attempts
             </Typography>
-            <TableContainer component={Paper}>
-                <Table
-                // size="small"
-                >
-                    <SortedTableHead
-                        classes={classes}
-                        order={order}
-                        orderBy={orderBy}
-                        onRequestSort={handleRequestSort}
-                    />
-                    <TableBody>
-                        {rows.map((row) => (
-                            <Row
-                                key={row.id}
-                                verifyAttempt={row}
-                            />
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <VerifyAttemptsTable verifyAttempts={props.verifyAttempts} />
         </>
     )
 }

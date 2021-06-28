@@ -1,4 +1,4 @@
-import { Backdrop, CircularProgress, makeStyles, TextField, Typography } from '@material-ui/core'
+import { Backdrop, Box, CircularProgress, makeStyles, Typography } from '@material-ui/core'
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
 import ArrowRightIcon from '@material-ui/icons/ArrowRight'
 import CodeIcon from '@material-ui/icons/Code'
@@ -108,6 +108,14 @@ const useStyles = makeStyles({
         position: 'absolute',
         zIndex: 'auto',
         color: '#fff',
+    },
+    fileContent: {
+        background: '#f8f9fa', height: 600, overflowY: 'auto',
+        border: '1px solid',
+        borderRadius: 4,
+        borderColor: '#bfbfc0',
+        whiteSpace: 'pre-wrap',
+        padding: 10
     }
 })
 
@@ -283,13 +291,9 @@ const SourceTreeView: FC<IProps> = ({ sourceData }) => {
             </TreeView>
             <div style={{ width: '80%', marginLeft: 20 }}>
                 <Typography variant='h6'>{activeFile}</Typography>
-                <TextField
-                    type="text"
-                    fullWidth
-                    variant='outlined'
-                    multiline
-                    value={content}
-                />
+                <Box my={2} className={classes.fileContent} >
+                    {content}
+                </Box>
             </div>
             <Backdrop className={classes.backdrop} open={isLoading} >
                 <CircularProgress color="inherit" />

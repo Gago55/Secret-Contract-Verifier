@@ -1,4 +1,4 @@
-import { SvgIcon, Paper, Table, TableBody, TableCell, TableRow } from '@material-ui/core'
+import { SvgIcon, Paper, Box, Table, TableBody, TableCell, TableRow } from '@material-ui/core'
 import React, { FC } from 'react'
 import { CodeType } from '../api/appAPI'
 import { StateType } from '../redux/store'
@@ -18,8 +18,15 @@ const Code: FC<IProps> = ({ code }) => {
                         <TableRow >
                             <TableCell component="th" scope="row" style={{ fontWeight: 'bold' }}>Code Overview</TableCell>
                             <TableCell align="right">
-                                {code.isVerified && <IsVerifiedIcon />}
-                                {!code.isVerified && <NoneVerifiedIcon />}
+                                <Box style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-end',
+                                    columnGap: 5
+                                }}>
+                                    {code.isVerified && <>Verified <IsVerifiedIcon /></>}
+                                    {!code.isVerified && <>Not Verified <NoneVerifiedIcon /></>}
+                                </Box>
                             </TableCell>
                         </TableRow>
                         <TableRow >

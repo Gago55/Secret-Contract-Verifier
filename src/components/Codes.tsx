@@ -8,6 +8,7 @@ import { useHistory } from 'react-router-dom'
 import { CodeType, ContractType } from '../api/appAPI'
 import { actions, getCodes } from '../redux/appReducer'
 import { StateType } from '../redux/store'
+import { IsVerifiedIcon, NoneVerifiedIcon } from './common'
 
 interface IProps {
     codes: Array<CodeType>
@@ -36,7 +37,7 @@ interface ISortedTableHeadProps {
 interface HeadCellType {
     id: OrderByType
     label: string
-    alignRight: boolean
+    align: 'left' | 'right' | 'center'
 }
 
 interface RowDataType {
@@ -97,11 +98,14 @@ const Row: FC<IRowProps> = ({ row, contracts, setActualCodeById }) => {
                     {row.id}
                 </TableCell>
                 <TableCell align='right'>{row.contractsCount}</TableCell>
-                <TableCell align='right'>{row.isVerified}</TableCell>
-                <TableCell align='center' >
+                <TableCell align='center'>
+                    {row.isVerified == 'true' && <IsVerifiedIcon />}
+                    {row.isVerified == 'false' && <NoneVerifiedIcon />}
+                </TableCell>
+                {/* <TableCell align='center' >
                     {row.isVerified == 'true' && <Button variant='contained' color='primary'>Show</Button>}
                     {row.isVerified == 'false' && <Button variant='contained' color='primary'>Provide</Button>}
-                </TableCell>
+                </TableCell> */}
             </TableRow>
             <TableRow>
                 <TableCell style={{ paddingLeft: 100, paddingRight: 100, paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -170,17 +174,17 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
 const headCells = [
     {
         id: "id",
-        alignRight: false,
+        align: 'left',
         label: "ID"
     },
     {
         id: "contractsCount",
-        alignRight: true,
+        align: 'right',
         label: "Contracts Count"
     },
     {
         id: "isVerified",
-        alignRight: true,
+        align: 'center',
         label: "Is Verified"
     }
 ] as Array<HeadCellType>
@@ -196,7 +200,7 @@ const SortedTableHead: FC<ISortedTableHeadProps> = ({ classes, order, orderBy, o
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
-                        align={headCell.alignRight ? 'right' : 'left'}
+                        align={headCell.align}
                         sortDirection={orderBy === headCell.id ? order : false}
                     >
                         <TableSortLabel
@@ -213,7 +217,7 @@ const SortedTableHead: FC<ISortedTableHeadProps> = ({ classes, order, orderBy, o
                         </TableSortLabel>
                     </TableCell>
                 ))}
-                <TableCell align='center' >Action</TableCell>
+                {/* <TableCell align='center' >Action</TableCell> */}
             </TableRow>
         </TableHead>
     )
@@ -258,7 +262,9 @@ const Codes: FC<IProps> = props => {
                 Codes
             </Typography>
             <TableContainer component={Paper}>
-                <Table>
+                <Table
+                // size="small"
+                >
                     <SortedTableHead
                         classes={classes}
                         order={order}
