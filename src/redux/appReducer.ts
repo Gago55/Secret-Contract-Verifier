@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux'
 import { ThunkAction } from 'redux-thunk'
-import { CodeType, fetchCodeByContractAddress, fetchCodes, fetchSourceData, fetchVerifyAttempt, fetchVerifyAttempts, SourceDataType, verifyAttempt, VerifyAttemptType } from './../api/appAPI'
+import { CodeType, fetchCodeByContractAddress, fetchCodes, fetchSourceData, fetchVerifyAttempt, fetchVerifyAttempts, fetchVerifyAttemptsByCodeId, SourceDataType, verifyAttempt, VerifyAttemptType } from './../api/appAPI'
 import { InferActionsType, StateType } from './store'
 
 export type VerifyResponseType = {
@@ -20,7 +20,8 @@ const initState = {
     verifyResponseError: '',
     actualVerifyAttempt: undefined as undefined | VerifyAttemptType,
     actualSourceData: undefined as undefined | SourceDataType,
-    verifyAttempts: [] as Array<VerifyAttemptType>
+    verifyAttempts: [] as Array<VerifyAttemptType>,
+    actualCodeVerifyAttempts: [] as Array<VerifyAttemptType>,
 }
 
 type InitStateType = typeof initState
@@ -72,6 +73,12 @@ const appReducer = (state = initState, action: ActionsType): InitStateType => {
                 verifyAttempts: action.arr
             }
         }
+        case 'sc/app/SET_ACTUAL_CODE_VERIFY_ATTEMPTS': {
+            return {
+                ...state,
+                actualCodeVerifyAttempts: action.arr
+            }
+        }
         default:
             return state
     }
@@ -86,15 +93,15 @@ export const actions = {
     setActualVerifyAttempt: (attempt: VerifyAttemptType) => ({ type: 'sc/app/SET_ACTUAL_VERIFY_ATTEMPT', attempt } as const),
     setActualSourceData: (data: SourceDataType) => ({ type: 'sc/app/SET_ACTUAL_SOURCE_DATA', data } as const),
     setVerifyAttempts: (arr: Array<VerifyAttemptType>) => ({ type: 'sc/app/SET_VERIFY_ATTEMPTS', arr } as const),
+    setActualCodeVerifyAttempts: (arr: Array<VerifyAttemptType>) => ({ type: 'sc/app/SET_ACTUAL_CODE_VERIFY_ATTEMPTS', arr } as const),
 }
 
 export type ActionsType = InferActionsType<typeof actions>
 
 type ThunkType = ThunkAction<Promise<void>, StateType, unknown, ActionsType>
-type DispatchType = Dispatch<ActionsType>
 
 //Thunks
-export const getCodes = (): ThunkType => async (dispatch: DispatchType) => {
+export const getCodes = (): ThunkType => async (dispatch) => {
     try {
         const codes = await fetchCodes()
         dispatch(actions.setCodes(codes))
@@ -103,7 +110,7 @@ export const getCodes = (): ThunkType => async (dispatch: DispatchType) => {
     }
 }
 
-export const getCodeByContractAddress = (address: string): ThunkType => async (dispatch: DispatchType, getState: () => StateType) => {
+export const getCodeByContractAddress = (address: string): ThunkType => async (dispatch, getState: () => StateType) => {
 
     const codes = getState().appReducer.codes
 
@@ -123,13 +130,14 @@ export const getCodeByContractAddress = (address: string): ThunkType => async (d
         try {
             const code = await fetchCodeByContractAddress(address)
             dispatch(actions.setActualCode(code))
+            // dispatch(getVerifyAttemptsByCodeId(code.id))
         } catch (error) {
             window.location.href = '/'
         }
     }
 }
 
-export const verify = (codeId: number, zipData: FormData): ThunkType => async (dispatch: DispatchType) => {
+export const verify = (codeId: number, zipData: FormData): ThunkType => async (dispatch) => {
     try {
         const verifyResponse = await verifyAttempt(codeId, zipData)
         console.log(verifyResponse)
@@ -147,7 +155,7 @@ export const verify = (codeId: number, zipData: FormData): ThunkType => async (d
     }
 }
 
-export const getVerifyAttempt = (id: string): ThunkType => async (dispatch: DispatchType) => {
+export const getVerifyAttempt = (id: string): ThunkType => async (dispatch) => {
     try {
         const attempt = await fetchVerifyAttempt(id)
 
@@ -156,7 +164,7 @@ export const getVerifyAttempt = (id: string): ThunkType => async (dispatch: Disp
     }
 }
 
-export const getVerifyAttempts = (): ThunkType => async (dispatch: DispatchType) => {
+export const getVerifyAttempts = (): ThunkType => async (dispatch) => {
     try {
         const data = await fetchVerifyAttempts()
 
@@ -165,7 +173,16 @@ export const getVerifyAttempts = (): ThunkType => async (dispatch: DispatchType)
     }
 }
 
-export const getSourceData = (codeId: number | string): ThunkType => async (dispatch: DispatchType) => {
+export const getVerifyAttemptsByCodeId = (codeId: number): ThunkType => async (dispatch) => {
+    try {
+        const data = await fetchVerifyAttemptsByCodeId(codeId)
+
+        dispatch(actions.setActualCodeVerifyAttempts(data))
+    } catch (error) {
+    }
+}
+
+export const getSourceData = (codeId: number | string): ThunkType => async (dispatch) => {
     try {
         const data = await fetchSourceData(codeId)
 

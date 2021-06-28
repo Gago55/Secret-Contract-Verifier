@@ -1,14 +1,27 @@
-import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core'
+import { Box, Button, makeStyles, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core'
 import React, { FC, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { compose } from 'redux'
-import { CodeType, ContractType, SourceDataType } from '../api/appAPI'
-import { actions, getCodeByContractAddress, getSourceData, verify, VerifyResponseType } from '../redux/appReducer'
+import { CodeType, ContractType, SourceDataType, VerifyAttemptType } from '../api/appAPI'
+import { actions, getCodeByContractAddress, getSourceData, getVerifyAttemptsByCodeId, verify, VerifyResponseType } from '../redux/appReducer'
 import { StateType } from '../redux/store'
 import Code from './Code'
 import Contract from './Contract'
 import Source from './Source'
+import { VerifyAttemptsTable } from './VerifyAttempts'
+import { Shift } from './common'
+
+const useStyles = makeStyles({
+    allVerifyAttemptsSpan: {
+        // margin: 10,
+        fontWeight: 'bolder',
+        color: '#3498db',
+        '&:hover': {
+            cursor: 'pointer'
+        }
+    }
+})
 
 interface IProps {
     address: string | undefined
@@ -16,21 +29,31 @@ interface IProps {
     actualSourceData?: SourceDataType
     verifyResponse: VerifyResponseType
     verifyResponseError: string
+    actualCodeVerifyAttempts: Array<VerifyAttemptType>
 
     getCodeByContractAddress(address: string): void
     verify(codeId: number, zipData: FormData): void
     setVerifyResponse(status: number, id: string, onProgressId: string): void
     setVerifyResponseError(msg: string): void
     getSourceData(codeId: number | string): void
+    getVerifyAttemptsByCodeId(codeId: number): void
 }
 
 const DetailedView: FC<IProps> = props => {
+    const classes = useStyles()
 
     const history = useHistory()
 
     // useEffect(()=>{
 
-    // },[])
+    // },[])  
+
+    useEffect(() => {
+        if (props.actualCode)
+            props.getVerifyAttemptsByCodeId(props.actualCode.id)
+    }, [props.actualCode])
+
+
     if (!props.address)
         return <></>
 
@@ -42,6 +65,8 @@ const DetailedView: FC<IProps> = props => {
         props.getCodeByContractAddress(props.address)
         return <></>
     }
+
+
 
     const contract = props.actualCode.contracts.find(c => c.address == props.address) as ContractType
 
@@ -63,6 +88,22 @@ const DetailedView: FC<IProps> = props => {
             actualSourceData={props.actualSourceData}
             getSourceData={props.getSourceData}
         />
+        <Paper style={{ width: '100%', padding: 15 }}>
+            <Typography variant="h6" style={{ marginBottom: 15 }}>
+                Verify Attempts
+            </Typography>
+            <VerifyAttemptsTable verifyAttempts={props.actualCodeVerifyAttempts} isSmall />
+            <Box mt={2} style={{ display: 'flex' }}>
+                <Shift />
+                <span
+                    className={classes.allVerifyAttemptsSpan}
+                    onClick={() => { history.push('/verifyattempts') }}
+                >
+                    All Verify Attempts
+                </span>
+            </Box>
+
+        </Paper>
     </Box>
     )
 }
@@ -72,6 +113,7 @@ const mapStateToProps = (state: StateType) => ({
     actualSourceData: state.appReducer.actualSourceData,
     verifyResponse: state.appReducer.verifyResponse,
     verifyResponseError: state.appReducer.verifyResponseError,
+    actualCodeVerifyAttempts: state.appReducer.actualCodeVerifyAttempts
 })
 
 export default connect(mapStateToProps, {
@@ -79,5 +121,6 @@ export default connect(mapStateToProps, {
     verify,
     setVerifyResponse: actions.setVerifyResponse,
     setVerifyResponseError: actions.setVerifyResponseError,
-    getSourceData
+    getSourceData,
+    getVerifyAttemptsByCodeId
 })(DetailedView)

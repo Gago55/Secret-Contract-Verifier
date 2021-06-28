@@ -74,6 +74,10 @@ export const fetchVerifyAttempts = () => (
     secretContracts.get<Array<VerifyAttemptType>>(`/verifyattempts/`).then(res => res.data)
 )
 
+export const fetchVerifyAttemptsByCodeId = (codeId: number) => (
+    secretContracts.get<Array<VerifyAttemptType>>(`/verifyattempts/codeId/${codeId}`).then(res => res.data)
+)
+
 export const fetchSourceData = (codeId: number | string) => (
     secretContracts.get<SourceDataType>(`/verifiedsource/${codeId}`).then(res => res.data)
 )
