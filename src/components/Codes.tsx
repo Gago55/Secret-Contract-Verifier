@@ -57,9 +57,9 @@ type GetComparatorReturnType = (
 
 const useRowStyles = makeStyles({
     root: {
-        '& > *': {
-            borderBottom: 'unset',
-        },
+        // '& > *': {
+        //     borderBottom: 'unset',
+        // },
     },
 })
 

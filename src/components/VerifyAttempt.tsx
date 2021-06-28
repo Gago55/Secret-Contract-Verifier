@@ -84,7 +84,7 @@ const VerifyAttempt: FC<IProps> = ({ attemptId, actualVerifyAttempt, getVerifyAt
 
     return (<>
         <Typography variant="h6" noWrap style={{ marginBottom: 5, display: 'flex', justifyContent: 'space-between' }}>
-            <span>Verify Attempt for CodeID {actualVerifyAttempt.codeId}</span>
+            <span>Verify Attempt logs for CodeID {actualVerifyAttempt.codeId}</span>
             <span>
                 Status -
                 <i style={{
@@ -111,9 +111,15 @@ const VerifyAttempt: FC<IProps> = ({ attemptId, actualVerifyAttempt, getVerifyAt
                     color: 'white',
                     fontFamily: "Ubuntu Mono",
                     boxSizing: 'border-box',
-                    overflowY: 'scroll'
+                    overflowY: 'scroll',
+                    wordBreak: 'break-all'
                 }}
             >
+                <span style={{ color: '#00f100' }}>root@secret-contracts</span>
+                :<span style={{ color: '#0071f1' }}>/</span>{'$ '}date<br />
+                {new Date(actualVerifyAttempt.date).toString()}<br />
+                {/* {new Date(actualVerifyAttempt.date).toLocaleString()}<br /> */}
+
                 <span style={{ color: '#00f100' }}>root@secret-contracts</span>
                 :<span style={{ color: '#0071f1' }}>/</span>{'$ '}
                 {viewLogs(actualVerifyAttempt.logs)}

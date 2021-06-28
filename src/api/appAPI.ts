@@ -27,13 +27,13 @@ export type VerifyAttemptType = {
     codeId: number
     status: 'success' | 'failed' | 'onProgress' | 'inOrder'
     logs: Array<string>
-    date: Date
+    date: string
 }
 
 export type SourceDataType = {
     codeId: number
     zipData: string
-    date: Date
+    date: string
     githubLink?: string
 }
 
@@ -68,6 +68,10 @@ export const verifyAttempt = (codeId: number, zipData: FormData) => (
 
 export const fetchVerifyAttempt = (id: string) => (
     secretContracts.get<VerifyAttemptType>(`/verifyattempts/${id}`).then(res => res.data)
+)
+
+export const fetchVerifyAttempts = () => (
+    secretContracts.get<Array<VerifyAttemptType>>(`/verifyattempts/`).then(res => res.data)
 )
 
 export const fetchSourceData = (codeId: number | string) => (
