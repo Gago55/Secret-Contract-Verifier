@@ -11,6 +11,7 @@ import Contract from './Contract'
 import Source from './Source'
 import { VerifyAttemptsTable } from './VerifyAttempts'
 import { Shift } from './common'
+import { useSnackbar } from 'notistack'
 
 const useStyles = makeStyles({
     allVerifyAttemptsSpan: {
@@ -30,6 +31,7 @@ interface IProps {
     verifyResponse: VerifyResponseType
     verifyResponseError: string
     actualCodeVerifyAttempts: Array<VerifyAttemptType>
+    getContractError: string
 
     getCodeByContractAddress(address: string): void
     verify(codeId: number, zipData: FormData): void
@@ -43,6 +45,7 @@ const DetailedView: FC<IProps> = props => {
     const classes = useStyles()
 
     const history = useHistory()
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar()
 
     // useEffect(()=>{
 
@@ -62,11 +65,24 @@ const DetailedView: FC<IProps> = props => {
         history.push('/')
 
     if (!props.actualCode) {
-        props.getCodeByContractAddress(props.address)
-        return <></>
+        if (!props.getContractError) {
+            props.getCodeByContractAddress(props.address)
+            return <></>
+        }
+        else {
+            enqueueSnackbar(props.getContractError, {
+                variant: 'error',
+                anchorOrigin: {
+                    horizontal: 'center',
+                    vertical: 'bottom'
+                },
+                autoHideDuration: 7000,
+                onClose: () => { history.push('/') }
+            })
+
+            return <></>
+        }
     }
-
-
 
     const contract = props.actualCode.contracts.find(c => c.address == props.address) as ContractType
 
@@ -113,7 +129,8 @@ const mapStateToProps = (state: StateType) => ({
     actualSourceData: state.appReducer.actualSourceData,
     verifyResponse: state.appReducer.verifyResponse,
     verifyResponseError: state.appReducer.verifyResponseError,
-    actualCodeVerifyAttempts: state.appReducer.actualCodeVerifyAttempts
+    actualCodeVerifyAttempts: state.appReducer.actualCodeVerifyAttempts,
+    getContractError: state.appReducer.getContractError
 })
 
 export default connect(mapStateToProps, {

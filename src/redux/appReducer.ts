@@ -22,6 +22,7 @@ const initState = {
     actualSourceData: undefined as undefined | SourceDataType,
     verifyAttempts: [] as Array<VerifyAttemptType>,
     actualCodeVerifyAttempts: [] as Array<VerifyAttemptType>,
+    getContractError: ''
 }
 
 type InitStateType = typeof initState
@@ -79,6 +80,12 @@ const appReducer = (state = initState, action: ActionsType): InitStateType => {
                 actualCodeVerifyAttempts: action.arr
             }
         }
+        case 'sc/app/SET_GET_CONTRACT_ERROR': {
+            return {
+                ...state,
+                getContractError: action.msg
+            }
+        }
         default:
             return state
     }
@@ -94,6 +101,7 @@ export const actions = {
     setActualSourceData: (data: SourceDataType) => ({ type: 'sc/app/SET_ACTUAL_SOURCE_DATA', data } as const),
     setVerifyAttempts: (arr: Array<VerifyAttemptType>) => ({ type: 'sc/app/SET_VERIFY_ATTEMPTS', arr } as const),
     setActualCodeVerifyAttempts: (arr: Array<VerifyAttemptType>) => ({ type: 'sc/app/SET_ACTUAL_CODE_VERIFY_ATTEMPTS', arr } as const),
+    setGetContractError: (msg: string) => ({ type: 'sc/app/SET_GET_CONTRACT_ERROR', msg } as const),
 }
 
 export type ActionsType = InferActionsType<typeof actions>
@@ -132,7 +140,10 @@ export const getCodeByContractAddress = (address: string): ThunkType => async (d
             dispatch(actions.setActualCode(code))
             // dispatch(getVerifyAttemptsByCodeId(code.id))
         } catch (error) {
-            window.location.href = '/'
+            if (error.response.status === 402)
+                dispatch(actions.setGetContractError(error.response?.data.message))
+            else
+                dispatch(actions.setGetContractError('Something went wrong'))
         }
     }
 }
