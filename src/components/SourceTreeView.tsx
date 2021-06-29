@@ -1,12 +1,14 @@
-import { Backdrop, Box, CircularProgress, makeStyles, Typography } from '@material-ui/core'
+import { Backdrop, Box, Button, CircularProgress, makeStyles, Typography } from '@material-ui/core'
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
 import ArrowRightIcon from '@material-ui/icons/ArrowRight'
 import CodeIcon from '@material-ui/icons/Code'
 import FolderOpenIcon from '@material-ui/icons/FolderOpen'
+import GitHub from '@material-ui/icons/GitHub'
 import { TreeItem, TreeView } from '@material-ui/lab'
 import JSZip, { JSZipObject } from 'jszip'
 import React, { FC, useEffect, useState } from 'react'
 import { SourceDataType } from '../api/appAPI'
+import { Shift } from './common'
 
 const useTreeItemStyles = makeStyles((theme) => ({
     root: {
@@ -110,7 +112,7 @@ const useStyles = makeStyles({
         color: '#fff',
     },
     fileContent: {
-        background: '#f8f9fa', height: 600, overflowY: 'auto',
+        background: '#f8f9fa', height: 560, overflowY: 'auto',
         border: '1px solid',
         borderRadius: 4,
         borderColor: '#bfbfc0',
@@ -243,7 +245,7 @@ const SourceTreeView: FC<IProps> = ({ sourceData }) => {
 
     const getJSXFromFiles = (files: IFileStruct, num = 1, fName?: string) => {
 
-        const folderName = num === 1 ? 'zip' : fName?.split('/')[0]
+        const folderName = num === 1 ? `codeId${sourceData?.codeId}` : fName?.split('/')[0]
 
         return <StyledTreeItem nodeId={`${num}`} key={`${num}`} labelText={folderName} labelIcon={FolderOpenIcon}>
             {
@@ -276,29 +278,52 @@ const SourceTreeView: FC<IProps> = ({ sourceData }) => {
 
     }
 
+    const onGithubClick = () => {
+        window.open(sourceData?.githubLink, '_blank')?.focus()
+    }
+
+    const onDownloadClick = () => {
+        const a = document.createElement("a")
+        console.log(sourceData?.zipData)
+        a.href = "data:application/zip;base64," + sourceData?.zipData
+        a.download = `codeId${sourceData?.codeId}.zip`
+        a.click()
+    }
+
     return (
-        <div style={{ position: 'relative', display: 'flex', marginTop: 30, minHeight: 700, maxHeight: 700, overflowY: 'auto' }}>
+        <div style={{ position: 'relative' }}>
+            <div style={{ display: 'flex', marginTop: 30, height: 650, overflowY: 'auto' }}>
 
-            <TreeView
-                className={classes.root}
+                <TreeView
+                    className={classes.root}
 
-                defaultExpanded={['1']}
-                defaultCollapseIcon={<ArrowDropDownIcon />}
-                defaultExpandIcon={<ArrowRightIcon />}
-                defaultEndIcon={<div style={{ width: 24 }} />}
-            >
-                {files && getJSXFromFiles(files)}
-            </TreeView>
-            <div style={{ width: '80%', marginLeft: 20 }}>
-                <Typography variant='h6'>{activeFile}</Typography>
-                <Box my={2} className={classes.fileContent} >
-                    {content}
+                    defaultExpanded={['1']}
+                    defaultCollapseIcon={<ArrowDropDownIcon />}
+                    defaultExpandIcon={<ArrowRightIcon />}
+                    defaultEndIcon={<div style={{ width: 24 }} />}
+                >
+                    {files && getJSXFromFiles(files)}
+                </TreeView>
+                <Box style={{ width: '80%', marginLeft: 20 }}>
+                    <Typography variant='h6'>{activeFile}</Typography>
+                    <Box my={2} className={classes.fileContent} >
+                        {content}
+                    </Box>
                 </Box>
-            </div>
+
+            </div >
+            <Box display='flex' gridColumnGap={10}>
+                <Shift />
+
+                {sourceData?.githubLink && <Button style={{ background: 'black' }} variant='contained' onClick={onGithubClick}>
+                    <GitHub style={{ fill: 'white' }} />
+                </Button>}
+                <Button color="primary" variant='contained' onClick={onDownloadClick}>Download</Button>
+            </Box>
             <Backdrop className={classes.backdrop} open={isLoading} >
                 <CircularProgress color="inherit" />
             </Backdrop>
-        </div >
+        </div>
     )
 }
 
