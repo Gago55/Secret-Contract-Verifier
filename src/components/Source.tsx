@@ -324,7 +324,7 @@ const Source: FC<IProps> = ({
                                 )
                             }}
                         >
-                            http://localhost:3000/verifyattempts/{verifyResponse.verifyAttemptId}
+                            {process.env.REACT_APP_HOMEPAGE}/verifyattempts/{verifyResponse.verifyAttemptId}
                         </span>
                     </DialogContentText>
                 </>}
@@ -345,7 +345,7 @@ const Source: FC<IProps> = ({
                                 )
                             }}
                         >
-                            http://localhost:3000/verifyattempts/{verifyResponse.verifyAttemptId}
+                            {process.env.REACT_APP_HOMEPAGE}/verifyattempts/{verifyResponse.verifyAttemptId}
                         </span>
                     </DialogContentText>
                     <DialogContentText align={textAlignOfDialog}>
@@ -361,7 +361,7 @@ const Source: FC<IProps> = ({
                                 )
                             }}
                         >
-                            http://localhost:3000/verifyattempts/{verifyResponse.onProgressAttemptId}
+                            {process.env.REACT_APP_HOMEPAGE}/verifyattempts/{verifyResponse.onProgressAttemptId}
                         </span>
                     </DialogContentText>
 
@@ -383,7 +383,7 @@ const Source: FC<IProps> = ({
                                 )
                             }}
                         >
-                            http://localhost:3000/verifyattempts/{verifyResponse.onProgressAttemptId}
+                            {process.env.REACT_APP_HOMEPAGE}/verifyattempts/{verifyResponse.onProgressAttemptId}
                         </span>
                     </DialogContentText>
                 </>}
