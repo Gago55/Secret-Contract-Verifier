@@ -177,7 +177,7 @@ app.post('/codes/verify/:codeID', cpUpload, async (req, res) => {
             const verifyAttempt = new VerifyAttemptModel({ codeId: code.id })
             await verifyAttempt.save()
 
-            verify(zipData.buffer, builderVersion, code, verifyAttempt, process.env.SAVE_TO_GITHUB)
+            verify(zipData.buffer, builderVersion, code, verifyAttempt, JSON.parse(process.env.SAVE_TO_GITHUB))
 
             res.json({ verifyAttemptId: verifyAttempt.id })
         }
