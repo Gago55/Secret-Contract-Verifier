@@ -13,4 +13,4 @@ REACT_APP_HOMEPAGE=
 
 ## How to setup back-end
 
-[Instruction](https://github.com/Gago55/Secret-Contract-Verifier/blob/master/backend/README.md)
+[Instruction](https://github.com/Gago55/Secret-Contract-Verifier/tree/master/backend#secret-contract-verifier)

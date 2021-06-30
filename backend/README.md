@@ -69,4 +69,4 @@ Make sure
 
 ## How to setup front-end
 
-[Instruction](https://github.com/Gago55/Secret-Contract-Verifier/blob/master/README.md)
+[Instruction](https://github.com/Gago55/Secret-Contract-Verifier#secret-contract-verifier)
