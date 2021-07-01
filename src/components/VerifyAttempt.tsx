@@ -92,7 +92,11 @@ const VerifyAttempt: FC<IProps> = ({ attemptId, actualVerifyAttempt, getVerifyAt
                     color: actualVerifyAttempt.status === 'failed' ? 'red'
                         : actualVerifyAttempt.status === 'success' ? 'green' : 'black'
                 }}>
-                    {actualVerifyAttempt.status !== 'inOrder' ? ' ' + actualVerifyAttempt.status : ' inQueue'}
+                    {
+                        actualVerifyAttempt.status === 'inOrder' ? ' inQueue'
+                            : actualVerifyAttempt.status === 'onProgress' ? ' inProgress'
+                                : ' ' + actualVerifyAttempt.status
+                    }
                 </i>
             </span>
         </Typography>

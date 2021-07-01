@@ -65,7 +65,13 @@ const Row: FC<IRowProps> = ({ verifyAttempt }) => {
             <TableRow className={classes.root} hover onClick={() => { handleRowClick(verifyAttempt.id) }}>
                 <TableCell align='center'> {verifyAttempt.id} </TableCell>
                 <TableCell align='center'>{verifyAttempt.codeId}</TableCell>
-                <TableCell align='center'>{verifyAttempt.status === 'inOrder' ? 'inQueue' : verifyAttempt.status}</TableCell>
+                <TableCell align='center'>
+                    {
+                        verifyAttempt.status === 'inOrder' ? 'inQueue'
+                            : verifyAttempt.status === 'onProgress' ? 'inProgress'
+                                : verifyAttempt.status
+                    }
+                </TableCell>
                 <TableCell align='center'>{new Date(verifyAttempt.date).toLocaleString(undefined, { hour12: false })}</TableCell>
             </TableRow>
         </>
