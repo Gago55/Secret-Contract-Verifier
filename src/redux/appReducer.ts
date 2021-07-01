@@ -140,7 +140,7 @@ export const getCodeByContractAddress = (address: string): ThunkType => async (d
             dispatch(actions.setActualCode(code))
             // dispatch(getVerifyAttemptsByCodeId(code.id))
         } catch (error) {
-            if (error.response.status === 402)
+            if (error.response?.status === 402)
                 dispatch(actions.setGetContractError(error.response?.data.message))
             else
                 dispatch(actions.setGetContractError('Something went wrong'))

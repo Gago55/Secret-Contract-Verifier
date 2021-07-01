@@ -1,4 +1,4 @@
-import { Backdrop, Box, Button, CircularProgress, makeStyles, Typography } from '@material-ui/core'
+import { Backdrop, Box, Button, Switch, FormControlLabel, CircularProgress, makeStyles, Typography } from '@material-ui/core'
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
 import ArrowRightIcon from '@material-ui/icons/ArrowRight'
 import CodeIcon from '@material-ui/icons/Code'
@@ -9,6 +9,8 @@ import JSZip, { JSZipObject } from 'jszip'
 import React, { FC, useEffect, useState } from 'react'
 import { SourceDataType } from '../api/appAPI'
 import { Shift } from './common'
+import SyntaxHighlighter from 'react-syntax-highlighter'
+import OldHopeStyle from 'react-syntax-highlighter/dist/esm/styles/hljs/an-old-hope'
 
 const useTreeItemStyles = makeStyles((theme) => ({
     root: {
@@ -112,12 +114,13 @@ const useStyles = makeStyles({
         color: '#fff',
     },
     fileContent: {
-        background: '#f8f9fa', height: 560, overflowY: 'auto',
+        height: 560,
+        overflowY: 'auto',
         border: '1px solid',
         borderRadius: 4,
         borderColor: '#bfbfc0',
-        whiteSpace: 'pre-wrap',
-        padding: 10
+        // whiteSpace: 'pre-wrap',
+        // padding: 10
     }
 })
 
@@ -136,6 +139,7 @@ const SourceTreeView: FC<IProps> = ({ sourceData }) => {
     const [content, setContent] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [activeFile, setActiveFile] = useState('')
+    const [darkMode, setDarkMode] = useState(false)
 
 
     useEffect(() => {
@@ -262,8 +266,10 @@ const SourceTreeView: FC<IProps> = ({ sourceData }) => {
                             color="#1a73e8"
                             bgColor="#e8f0fe"
                             onClick={() => {
-                                setActiveFile(name)
-                                setContent(files[name] as string)
+                                if (name !== activeFile) {
+                                    setActiveFile(name)
+                                    setContent(files[name] as string)
+                                }
                             }}
                         />
                     }
@@ -290,9 +296,28 @@ const SourceTreeView: FC<IProps> = ({ sourceData }) => {
         a.click()
     }
 
+    const getLanguage = (fileName: string) => {
+        const help = {
+            rs: 'rust',
+            json: 'json',
+            md: 'markdown',
+            toml: 'toml',
+            lock: 'toml',
+            Makefile: 'makefile',
+            sh: 'sh',
+            other: undefined
+        }
+
+        const ex = fileName.split('.').pop()
+
+        // @ts-ignore
+        return help[ex ? ex : 'other']
+    }
+
+
     return (
         <div style={{ position: 'relative' }}>
-            <div style={{ display: 'flex', marginTop: 30, height: 650, overflowY: 'auto' }}>
+            <div style={{ display: 'flex', marginTop: 30, height: 650, overflowY: 'auto', overflowX: 'hidden' }}>
 
                 <TreeView
                     className={classes.root}
@@ -306,8 +331,30 @@ const SourceTreeView: FC<IProps> = ({ sourceData }) => {
                 </TreeView>
                 <Box style={{ width: '80%', marginLeft: 20 }}>
                     <Typography variant='h6'>{activeFile}</Typography>
-                    <Box my={2} className={classes.fileContent} >
-                        {content}
+                    <Box style={{ position: 'relative' }}>
+                        <SyntaxHighlighter
+                            language={getLanguage(activeFile)}
+                            showLineNumbers
+                            customStyle={!darkMode ? { background: '#f8f9fa' } : undefined}
+                            className={classes.fileContent}
+                            style={darkMode ? OldHopeStyle : undefined}
+                        >
+                            {content}
+                        </SyntaxHighlighter>
+                        <FormControlLabel
+                            style={{ position: 'absolute', right: 10, top: 0, color: darkMode ? 'white' : 'black' }}
+                            control={
+                                <Switch
+                                    checked={darkMode}
+                                    onChange={() => { setDarkMode(!darkMode) }}
+                                    color="secondary"
+                                    name="checkedB"
+                                    inputProps={{ 'aria-label': 'primary checkbox' }}
+                                />
+                            }
+                            label="Dark Theme"
+                            labelPlacement="start"
+                        />
                     </Box>
                 </Box>
 
