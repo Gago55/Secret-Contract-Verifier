@@ -104,6 +104,7 @@ app.get('/codeswithcontracts', async (req, res) => {
                 isVerified: code.isVerified,
                 creator: code.creator,
                 checksum: code.checksum,
+                builder: code.builder,
                 source: code.source,
                 contracts
             })

@@ -29,10 +29,10 @@ const Code: FC<IProps> = ({ code }) => {
                                 </Box>
                             </TableCell>
                         </TableRow>
-                        <TableRow >
+                        {/* <TableRow >
                             <TableCell component="th" scope="row">Id</TableCell>
                             <TableCell align="right">{code.id}</TableCell>
-                        </TableRow>
+                        </TableRow> */}
                         <TableRow >
                             <TableCell component="th" scope="row">Data Hash</TableCell>
                             <TableCell align="right">{code.checksum}</TableCell>
