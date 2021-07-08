@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom'
 import { Box, Paper, Typography } from '@material-ui/core'
 import { CircularProgress } from '@material-ui/core'
 import { useEffect } from 'react'
+import { Line } from 'three'
 
 interface IProps {
     attemptId: string | undefined
@@ -67,18 +68,30 @@ const VerifyAttempt: FC<IProps> = ({ attemptId, actualVerifyAttempt, getVerifyAt
     }
 
     const viewLogs = (logs: Array<string>) => {
-        const keyWords = ['Building', 'Updating', 'Downloading', 'Downloaded', ' Compiling', 'Something', 'warning', 'Finished', 'FALSE', 'TRUE']
+        const keyWords = [
+            { text: 'Building' },
+            { text: 'Updating', color: '#00f100' },
+            { text: 'Downloading', color: '#00f100' },
+            { text: 'Downloaded', color: '#00f100' },
+            { text: 'Compiling', color: '#00f100' },
+            { text: 'Something' },
+            { text: 'warning', color: 'yellow' },
+            { text: 'error', color: 'red' },
+            { text: 'Finished', },
+            { text: 'FALSE', color: 'red' },
+            { text: 'TRUE', color: '#00f100' }
+        ]
         const doubleReturn = ['\n\n']
 
         let str = logs.join(' ')
 
         keyWords.forEach(word => {
-            str = str.replaceAll(word, '\n' + word)
+            str = str.replaceAll(word.text, word.color ? `\n<span style="color:${word.color}">${word.text}</span>` : '\n' + word.text)
         })
 
         str = str.replaceAll(new RegExp(doubleReturn.join('|'), 'g'), '\n')
 
-        return str.split('\n').map(str => <>{str}<br /></>)
+        return str.split('\n').map(str => `${str}<br />`)
     }
 
 
@@ -122,13 +135,10 @@ const VerifyAttempt: FC<IProps> = ({ attemptId, actualVerifyAttempt, getVerifyAt
                 <span style={{ color: '#00f100' }}>root@secret-contracts</span>
                 :<span style={{ color: '#0071f1' }}>/</span>{'$ '}date<br />
                 {new Date(actualVerifyAttempt.date).toString()}<br />
-                {/* {new Date(actualVerifyAttempt.date).toLocaleString()}<br /> */}
 
                 <span style={{ color: '#00f100' }}>root@secret-contracts</span>
                 :<span style={{ color: '#0071f1' }}>/</span>{'$ '}
-                {viewLogs(actualVerifyAttempt.logs)}
-
-
+                {viewLogs(actualVerifyAttempt.logs).map(line => <div dangerouslySetInnerHTML={{ __html: line }} />)}
             </div>
             {(actualVerifyAttempt.status === 'onProgress' || actualVerifyAttempt.status === 'inOrder')
                 && <CircularProgress style={{ position: 'absolute', right: 20, bottom: 5, color: 'white' }} size={20} disableShrink />
