@@ -33,7 +33,7 @@ sudo apt-get install git
 3. Set values in `.env` file
 ```
 MONGODB_URL=connection string
-DATAHUB_API_URL=https://secret-2--lcd--full.datahub.figment.io/apikey/yurApiKey/
+DATAHUB_API_URL=https://secret-4--lcd--full.datahub.figment.io/apikey/yurApiKey/
 PORT=portNumber
 SAVE_TO_GITHUB=false
 ```
