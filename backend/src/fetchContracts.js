@@ -35,7 +35,7 @@ const fetchData = async () => {
 
             const newContracts = await client.getContracts(codeId)
 
-            for (const contract of newContracts) {
+            for (const contract of newContracts.splice(0,100)) {
                 const contractInDB = await ContractModel.findOne({ address: contract.address })
 
                 if (!contractInDB) {
