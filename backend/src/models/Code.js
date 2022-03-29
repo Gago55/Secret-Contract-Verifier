@@ -24,14 +24,7 @@ const codeSchema = new Schema({
         trim: true
     },
     builder: {
-        type: String,
-        enum: [
-            'enigmampc/secret-contract-optimizer:1.0.0',
-            'enigmampc/secret-contract-optimizer:1.0.1',
-            'enigmampc/secret-contract-optimizer:1.0.2',
-            'enigmampc/secret-contract-optimizer:1.0.3',
-            'enigmampc/secret-contract-optimizer:1.0.4'
-        ]
+        type: String
     },
 })
 
